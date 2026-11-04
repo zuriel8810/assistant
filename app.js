@@ -524,15 +524,23 @@ class AssistantApp {
 
     // Get current message history
     let history = [];
+    const assistantPlaceholder = {
+      role: 'assistant',
+      content: '',
+      timestamp: timeStr
+    };
+
     if (this.mode === 'continuous') {
       this.continuousMessages.push(userMsg);
+      history = [...this.continuousMessages];
+      this.continuousMessages.push(assistantPlaceholder);
       this.saveContinuousMessages(this.continuousMessages);
-      history = this.continuousMessages;
     } else {
       const threadMsgs = this.loadThreadMessages(this.activeThreadId);
       threadMsgs.push(userMsg);
+      history = [...threadMsgs];
+      threadMsgs.push(assistantPlaceholder);
       this.saveThreadMessages(this.activeThreadId, threadMsgs);
-      history = threadMsgs;
 
       // Auto-name thread from first user message if title is default
       const currentThread = this.threads.find(t => t.id === this.activeThreadId);
