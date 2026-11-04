@@ -61,7 +61,12 @@ class AIEngine {
   loadConfig() {
     try {
       const data = localStorage.getItem(AI_CONFIG_KEY);
-      return data ? { ...DEFAULT_AI_CONFIG, ...JSON.parse(data) } : { ...DEFAULT_AI_CONFIG };
+      let cfg = data ? { ...DEFAULT_AI_CONFIG, ...JSON.parse(data) } : { ...DEFAULT_AI_CONFIG };
+      if (cfg.model === 'claude-3-5-sonnet-20241022' || !cfg.model) {
+        cfg.model = 'claude-3-5-sonnet-20240620';
+        localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(cfg));
+      }
+      return cfg;
     } catch (e) {
       console.error('Error loading AI config:', e);
       return { ...DEFAULT_AI_CONFIG };
@@ -372,7 +377,7 @@ class AIEngine {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        model: this.config.model || 'claude-3-5-sonnet-20240620',
+        model: (this.config.model && this.config.model !== 'claude-3-5-sonnet-20241022') ? this.config.model : 'claude-3-5-sonnet-20240620',
         max_tokens: 4096,
         temperature: parseFloat(this.config.temperature) || 0.4,
         system: systemPrompt,

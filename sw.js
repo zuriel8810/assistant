@@ -1,4 +1,4 @@
-const CACHE_NAME = 'adam-assistant-v2';
+const CACHE_NAME = 'adam-assistant-v3';
 const ASSETS = [
   './',
   './index.html',
