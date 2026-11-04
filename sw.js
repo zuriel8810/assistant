@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ella-assistant-v1';
+const CACHE_NAME = 'adam-assistant-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   './app.js',
   './memory.js',
   './ai.js',
+  './google.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png'
@@ -30,16 +31,24 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Pass through external API calls directly
   if (event.request.url.includes('api.anthropic.com') ||
       event.request.url.includes('api.openai.com') ||
       event.request.url.includes('openrouter.ai') ||
+      event.request.url.includes('195.201.91.47') ||
+      event.request.url.includes('googleapis.com') ||
       event.request.method !== 'GET') {
     return;
   }
+  // Network first, falling back to cache
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).catch(() => cachedResponse);
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
