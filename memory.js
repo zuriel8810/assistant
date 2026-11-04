@@ -98,7 +98,11 @@ class MemoryManager {
 
   getMemories() {
     try {
-      const data = localStorage.getItem(MEMORY_STORAGE_KEY);
+      let data = localStorage.getItem(MEMORY_STORAGE_KEY);
+      if (!data) {
+        data = localStorage.getItem('assistant_shared_memories');
+        if (data) localStorage.setItem(MEMORY_STORAGE_KEY, data);
+      }
       return data ? JSON.parse(data) : DEFAULT_MEMORIES;
     } catch (e) {
       console.error('Error loading memories:', e);

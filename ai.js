@@ -60,12 +60,16 @@ class AIEngine {
 
   loadConfig() {
     try {
-      const data = localStorage.getItem(AI_CONFIG_KEY);
+      let data = localStorage.getItem(AI_CONFIG_KEY);
+      if (!data) {
+        // Automatically migrate from old assistant_ai_config so user doesn't lose their API key!
+        data = localStorage.getItem('assistant_ai_config');
+      }
       let cfg = data ? { ...DEFAULT_AI_CONFIG, ...JSON.parse(data) } : { ...DEFAULT_AI_CONFIG };
       if (cfg.model === 'claude-3-5-sonnet-20241022' || !cfg.model) {
         cfg.model = 'claude-3-5-sonnet-20240620';
-        localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(cfg));
       }
+      localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(cfg));
       return cfg;
     } catch (e) {
       console.error('Error loading AI config:', e);
