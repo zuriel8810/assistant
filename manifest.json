@@ -1,7 +1,7 @@
 {
-  "name": "אלה • עוזרת אישית עצמאית",
-  "short_name": "אלה עוזרת",
-  "description": "עוזרת אישית עצמאית וחכמה בבדק בית וניהול משימות",
+  "name": "אָדָם • עוזר אישי עצמאי",
+  "short_name": "אָדָם עוזר",
+  "description": "עוזר אישי עצמאי וחכם לבדק בית, אוטומציה וניהול משימות",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0b0f19",

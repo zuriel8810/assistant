@@ -1,5 +1,5 @@
 /**
- * Main Application Logic for Ella Personal Assistant
+ * Main Application Logic for אָדָם (Adam) Personal Assistant
  * Handles Dual Chat Modes, UI Interactions, Voice, Attachments, and Settings.
  */
 
@@ -91,6 +91,18 @@ class AssistantApp {
     this.tempValueDisplay = document.getElementById('tempValueDisplay');
     this.btnExportData = document.getElementById('btnExportData');
     this.btnClearHistory = document.getElementById('btnClearHistory');
+    
+    // Subagents & Stage B integrations
+    this.selectSubagent = document.getElementById('selectSubagent');
+    this.settingBackendUrl = document.getElementById('settingBackendUrl');
+    this.settingBackendToken = document.getElementById('settingBackendToken');
+    this.btnTestBackend = document.getElementById('btnTestBackend');
+    this.backendStatusBadge = document.getElementById('backendStatusBadge');
+    this.settingGoogleClientId = document.getElementById('settingGoogleClientId');
+    this.settingGoogleAccessToken = document.getElementById('settingGoogleAccessToken');
+    this.btnGoogleLogin = document.getElementById('btnGoogleLogin');
+    this.btnGoogleLogout = document.getElementById('btnGoogleLogout');
+    this.googleStatusBadge = document.getElementById('googleStatusBadge');
   }
 
   initMarkdown() {
@@ -855,6 +867,22 @@ class AssistantApp {
     this.settingTemperature.value = cfg.temperature || 0.4;
     this.tempValueDisplay.textContent = cfg.temperature || 0.4;
     this.handleProviderChange();
+    // Load Backend & Google config
+    if (this.settingBackendUrl) {
+      this.settingBackendUrl.value = window.aiEngine.backendConfig.serverUrl || 'http://195.201.91.47:8080';
+    }
+    if (this.settingBackendToken) {
+      this.settingBackendToken.value = window.aiEngine.backendConfig.serverToken || 'adam_secret_2026_hetzner';
+    }
+    if (this.settingGoogleClientId) {
+      this.settingGoogleClientId.value = window.googleClient.config.clientId || '';
+    }
+    if (this.settingGoogleAccessToken) {
+      this.settingGoogleAccessToken.value = window.googleClient.config.accessToken || '';
+    }
+    this.updateGoogleStatusUI();
+    this.checkBackendStatusSilent();
+
     this.settingsModal.classList.add('open');
   }
 
@@ -887,6 +915,21 @@ class AssistantApp {
       model: this.settingModel.value.trim(),
       temperature: parseFloat(this.settingTemperature.value) || 0.4
     });
+    // Save Backend and Google configs
+    if (this.settingBackendUrl && this.settingBackendToken) {
+      window.aiEngine.saveBackendConfig({
+        serverUrl: this.settingBackendUrl.value.trim(),
+        serverToken: this.settingBackendToken.value.trim()
+      });
+    }
+    if (this.settingGoogleClientId) {
+      const gTok = this.settingGoogleAccessToken ? this.settingGoogleAccessToken.value.trim() : '';
+      window.googleClient.saveConfig({
+        clientId: this.settingGoogleClientId.value.trim(),
+        accessToken: gTok || window.googleClient.config.accessToken
+      });
+    }
+
     this.closeSettingsModal();
     this.showToast('✓ ההגדרות נשמרו בהצלחה');
   }
@@ -909,7 +952,7 @@ class AssistantApp {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'ella_assistant_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+    a.download = 'adam_assistant_backup_' + new Date().toISOString().slice(0, 10) + '.json';
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -923,7 +966,22 @@ class AssistantApp {
       this.saveThreads([]);
       this.createNewThread('שיחה ראשונה');
       this.renderMessages([]);
-      this.closeSettingsModal();
+      // Save Backend and Google configs
+    if (this.settingBackendUrl && this.settingBackendToken) {
+      window.aiEngine.saveBackendConfig({
+        serverUrl: this.settingBackendUrl.value.trim(),
+        serverToken: this.settingBackendToken.value.trim()
+      });
+    }
+    if (this.settingGoogleClientId) {
+      const gTok = this.settingGoogleAccessToken ? this.settingGoogleAccessToken.value.trim() : '';
+      window.googleClient.saveConfig({
+        clientId: this.settingGoogleClientId.value.trim(),
+        accessToken: gTok || window.googleClient.config.accessToken
+      });
+    }
+
+    this.closeSettingsModal();
       this.showToast('היסטוריית הצ\'אט אופסה.');
     }
   }

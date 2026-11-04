@@ -954,3 +954,35 @@ body {
     z-index: 25;
   }
 }
+
+/* Sub-Agent Selector */
+.subagent-toggle-container {
+  display: flex;
+  align-items: center;
+  margin: 0 8px;
+}
+.subagent-select {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.subagent-select:hover, .subagent-select:focus {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+}
+.settings-divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+
