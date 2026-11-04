@@ -367,6 +367,18 @@ class AIEngine {
   async _streamAnthropic(messages, systemPrompt, { onChunk, onComplete, signal }) {
     const url = (this.config.customBaseUrl || 'https://api.anthropic.com/v1/messages').trim();
     
+    // Automatically sanitize model: force active Claude 5.5
+    let targetModel = (this.config.model || '').trim();
+    if (!targetModel || targetModel.includes('claude-3') || targetModel.includes('2024')) {
+      targetModel = 'claude-sonnet-5-5';
+      this.config.model = 'claude-sonnet-5-5';
+      try {
+        localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(this.config));
+        const el = document.getElementById('settingModel');
+        if (el) el.value = 'claude-sonnet-5-5';
+      } catch (e) {}
+    }
+
     const formattedMessages = messages.map(m => ({
       role: m.role === 'assistant' ? 'assistant' : 'user',
       content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content)
@@ -381,7 +393,7 @@ class AIEngine {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        model: (this.config.model && this.config.model !== 'claude-3-5-sonnet-20241022') ? this.config.model : 'claude-sonnet-5-5',
+        model: targetModel,
         max_tokens: 4096,
         temperature: parseFloat(this.config.temperature) || 0.4,
         system: systemPrompt,
@@ -391,18 +403,13 @@ class AIEngine {
       signal
     });
 
-    // Check for model fallback if 404 not found
-      if (response.status === 404 && !fallbackAttempted) {
-        console.warn('Model not found, attempting fallback to claude-3-5-sonnet-20240620 or claude-3-haiku-20240307...');
-        const fallbackModel = (payload.model.includes('sonnet') && !payload.model.includes('20240620')) 
-          ? 'claude-sonnet-5-5' 
-          : 'claude-haiku-5-5';
-        if (payload.model !== fallbackModel) {
-          payload.model = fallbackModel;
-          return this.callAnthropic(payload, onChunk, true);
-        }
-      }
-      if (!response.ok) {
+    if (response.status === 404 && targetModel !== 'claude-haiku-5-5') {
+      console.warn('Model returned 404, auto-switching to claude-haiku-5-5...');
+      this.config.model = 'claude-haiku-5-5';
+      try { localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(this.config)); } catch (e) {}
+      return this._streamAnthropic(messages, systemPrompt, { onChunk, onComplete, signal });
+    }
+    if (!response.ok) {
       const errText = await response.text();
       throw new Error('שגיאת Anthropic (' + response.status + '): ' + errText);
     }

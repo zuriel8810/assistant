@@ -15,7 +15,22 @@
   <!-- Markdown parser (marked.js) -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
+  <script>
+    // Force active model override on startup
+    try {
+      ['adam_ai_config', 'assistant_ai_config'].forEach(function(k) {
+        var raw = localStorage.getItem(k);
+        if (raw) {
+          var cfg = JSON.parse(raw);
+          if (!cfg.model || cfg.model.indexOf('claude-3') !== -1 || cfg.model.indexOf('2024') !== -1) {
+            cfg.model = 'claude-sonnet-5-5';
+            localStorage.setItem(k, JSON.stringify(cfg));
+          }
+        }
+      });
+    } catch(e) {}
+  </script>
 </head>
 <body>
 
@@ -347,10 +362,10 @@
 
 <!-- Scripts -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="google.js?v=5"></script>
-<script src="memory.js?v=5"></script>
-<script src="ai.js?v=5"></script>
-<script src="app.js?v=5"></script>
+  <script src="google.js?v=6"></script>
+<script src="memory.js?v=6"></script>
+<script src="ai.js?v=6"></script>
+<script src="app.js?v=6"></script>
 
 <script>
   // Register Service Worker for PWA
