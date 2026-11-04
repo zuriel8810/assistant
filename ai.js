@@ -9,7 +9,7 @@ const BACKEND_CONFIG_KEY = 'adam_backend_config';
 const DEFAULT_AI_CONFIG = {
   provider: 'anthropic',
   apiKey: '',
-  model: 'claude-3-5-sonnet-20241022',
+  model: 'claude-3-5-sonnet-20240620',
   temperature: 0.4,
   customBaseUrl: ''
 };
@@ -372,7 +372,7 @@ class AIEngine {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        model: this.config.model || 'claude-3-5-sonnet-20241022',
+        model: this.config.model || 'claude-3-5-sonnet-20240620',
         max_tokens: 4096,
         temperature: parseFloat(this.config.temperature) || 0.4,
         system: systemPrompt,
@@ -382,7 +382,18 @@ class AIEngine {
       signal
     });
 
-    if (!response.ok) {
+    // Check for model fallback if 404 not found
+      if (response.status === 404 && !fallbackAttempted) {
+        console.warn('Model not found, attempting fallback to claude-3-5-sonnet-20240620 or claude-3-haiku-20240307...');
+        const fallbackModel = (payload.model.includes('sonnet') && !payload.model.includes('20240620')) 
+          ? 'claude-3-5-sonnet-20240620' 
+          : 'claude-3-haiku-20240307';
+        if (payload.model !== fallbackModel) {
+          payload.model = fallbackModel;
+          return this.callAnthropic(payload, onChunk, true);
+        }
+      }
+      if (!response.ok) {
       const errText = await response.text();
       throw new Error('שגיאת Anthropic (' + response.status + '): ' + errText);
     }
