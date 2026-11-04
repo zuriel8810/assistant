@@ -863,7 +863,7 @@ class AssistantApp {
     const cfg = window.aiEngine.config;
     this.settingProvider.value = cfg.provider || 'anthropic';
     this.settingApiKey.value = cfg.apiKey || '';
-    this.settingModel.value = cfg.model || 'claude-sonnet-5-5';
+    this.settingModel.value = cfg.model || 'claude-haiku-5-5';
     this.settingTemperature.value = cfg.temperature || 0.4;
     this.tempValueDisplay.textContent = cfg.temperature || 0.4;
     this.handleProviderChange();
@@ -899,7 +899,7 @@ class AssistantApp {
     } else {
       keyGroup.style.display = 'block';
       if (p === 'anthropic' && (!this.settingModel.value || this.settingModel.value.includes('gpt'))) {
-        this.settingModel.value = 'claude-sonnet-5-5';
+        this.settingModel.value = 'claude-haiku-5-5';
       } else if (p === 'openai' && (!this.settingModel.value || this.settingModel.value.includes('claude'))) {
         this.settingModel.value = 'gpt-4o';
       } else if (p === 'openrouter') {

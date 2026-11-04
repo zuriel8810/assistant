@@ -9,7 +9,7 @@ const BACKEND_CONFIG_KEY = 'adam_backend_config';
 const DEFAULT_AI_CONFIG = {
   provider: 'anthropic',
   apiKey: '',
-  model: 'claude-sonnet-5-5',
+  model: 'claude-haiku-5-5',
   temperature: 0.4,
   customBaseUrl: ''
 };
@@ -67,7 +67,7 @@ class AIEngine {
       }
       let cfg = data ? { ...DEFAULT_AI_CONFIG, ...JSON.parse(data) } : { ...DEFAULT_AI_CONFIG };
       if (!cfg.model || cfg.model.startsWith('claude-3')) {
-        cfg.model = 'claude-sonnet-5-5';
+        cfg.model = 'claude-haiku-5-5';
       }
       localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(cfg));
       return cfg;
@@ -370,12 +370,12 @@ class AIEngine {
     // Automatically sanitize model: force active Claude 5.5
     let targetModel = (this.config.model || '').trim();
     if (!targetModel || targetModel.includes('claude-3') || targetModel.includes('2024')) {
-      targetModel = 'claude-sonnet-5-5';
-      this.config.model = 'claude-sonnet-5-5';
+      targetModel = 'claude-haiku-5-5';
+      this.config.model = 'claude-haiku-5-5';
       try {
         localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(this.config));
         const el = document.getElementById('settingModel');
-        if (el) el.value = 'claude-sonnet-5-5';
+        if (el) el.value = 'claude-haiku-5-5';
       } catch (e) {}
     }
 
@@ -393,7 +393,7 @@ class AIEngine {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        model: targetModel,
+        model: targetModel.includes("sonnet") ? "claude-haiku-5-5" : targetModel,
         max_tokens: 4096,
         temperature: parseFloat(this.config.temperature) || 0.4,
         system: systemPrompt,
