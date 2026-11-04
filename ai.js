@@ -9,7 +9,7 @@ const BACKEND_CONFIG_KEY = 'adam_backend_config';
 const DEFAULT_AI_CONFIG = {
   provider: 'anthropic',
   apiKey: '',
-  model: 'claude-3-5-sonnet-20240620',
+  model: 'claude-sonnet-5-5',
   temperature: 0.4,
   customBaseUrl: ''
 };
@@ -66,8 +66,8 @@ class AIEngine {
         data = localStorage.getItem('assistant_ai_config');
       }
       let cfg = data ? { ...DEFAULT_AI_CONFIG, ...JSON.parse(data) } : { ...DEFAULT_AI_CONFIG };
-      if (cfg.model === 'claude-3-5-sonnet-20241022' || !cfg.model) {
-        cfg.model = 'claude-3-5-sonnet-20240620';
+      if (!cfg.model || cfg.model.startsWith('claude-3')) {
+        cfg.model = 'claude-sonnet-5-5';
       }
       localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(cfg));
       return cfg;
@@ -381,7 +381,7 @@ class AIEngine {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        model: (this.config.model && this.config.model !== 'claude-3-5-sonnet-20241022') ? this.config.model : 'claude-3-5-sonnet-20240620',
+        model: (this.config.model && this.config.model !== 'claude-3-5-sonnet-20241022') ? this.config.model : 'claude-sonnet-5-5',
         max_tokens: 4096,
         temperature: parseFloat(this.config.temperature) || 0.4,
         system: systemPrompt,
@@ -395,8 +395,8 @@ class AIEngine {
       if (response.status === 404 && !fallbackAttempted) {
         console.warn('Model not found, attempting fallback to claude-3-5-sonnet-20240620 or claude-3-haiku-20240307...');
         const fallbackModel = (payload.model.includes('sonnet') && !payload.model.includes('20240620')) 
-          ? 'claude-3-5-sonnet-20240620' 
-          : 'claude-3-haiku-20240307';
+          ? 'claude-sonnet-5-5' 
+          : 'claude-haiku-5-5';
         if (payload.model !== fallbackModel) {
           payload.model = fallbackModel;
           return this.callAnthropic(payload, onChunk, true);
